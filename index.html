@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>VertechX — MVJ Treasure Hunt</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000;
+    --green:#36ff6b;
+    --muted: rgba(54,255,107,0.18);
+  }
+  html,body{ height:100%; margin:0; background:#000; font-family:"Press Start 2P",monospace; color:var(--green); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  .wrap{ height:100vh; display:flex; align-items:center; justify-content:center; padding:12px; box-sizing:border-box; }
+  .card{
+    width:920px; max-width:100%; height:86vh; max-height:980px; background:linear-gradient(180deg,#020202,#07100a); border-radius:10px; padding:18px; box-shadow:0 20px 60px rgba(0,0,0,0.7); display:flex; flex-direction:column; gap:12px;
+  }
+  .header { display:flex; flex-direction:column; gap:6px; }
+  .title { font-size:16px; color:var(--green); }
+  .subtitle { font-size:10px; color:var(--muted); letter-spacing:1px; }
+  .screen{ flex:1; background:rgba(0,0,0,0.45); border-radius:8px; padding:18px; overflow:auto; display:flex; align-items:center; justify-content:center; text-align:center; }
+  .screen .big { font-size:13px; line-height:1.5; }
+  .controls { display:flex; gap:10px; align-items:center; justify-content:center; }
+  input[type="text"], input[type="number"]{
+    background:rgba(0,0,0,0.7); color:var(--green); border:1px solid rgba(54,255,107,0.06); padding:10px 12px; border-radius:6px; font-family:inherit; font-size:11px;
+  }
+  .btn { padding:12px 14px; border-radius:8px; border:none; background:linear-gradient(90deg,#36ff6b,#1fbf6a); color:#012108; font-weight:700; cursor:pointer; font-family:inherit; text-transform:uppercase; font-size:11px; }
+  .muted { color:var(--muted); font-size:10px; margin-top:8px; }
+  .small { font-size:10px; color:var(--muted); }
+  .footer { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); }
+  .hidden{ display:none !important; }
+  @media (max-width:640px){
+    .card { height:95vh; padding:12px; }
+    .title { font-size:12px; }
+    .screen .big { font-size:11px; }
+    .btn { padding:10px 12px; font-size:10px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="application" aria-label="Treasure Hunt">
+
+      <div class="header">
+        <div class="title">VERTECHX — MVJ COLLEGE OF ENGINEERING</div>
+        <div class="subtitle">TREASURE HUNT</div>
+      </div>
+
+      <!-- Main screen area -->
+      <div class="screen" id="screen">
+        <!-- START overlay with "Get Started" -->
+        <div id="startView" class="view">
+          <div>
+            <div class="big">Get started with the Treasure Hunt</div>
+            <div class="muted" style="margin-top:14px">Press the button to enter your details</div>
+            <div style="margin-top:18px">
+              <button id="openForm" class="btn">Get Started</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Participant form -->
+        <div id="formView" class="view hidden">
+          <div style="width:100%;max-width:520px;">
+            <div class="big">Enter your details</div>
+            <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+              <input id="p_name" type="text" placeholder="Full name" />
+              <input id="p_section" type="text" placeholder="Section (e.g. A1)" />
+              <input id="p_year" type="number" inputmode="numeric" min="1" max="6" placeholder="Year (e.g. 2)" />
+              <input id="p_branch" type="text" placeholder="Branch (e.g. CSE)" />
+              <div style="margin-top:10px; display:flex; gap:10px; justify-content:center;">
+                <button id="startBtn" class="btn">Start Hunt</button>
+                <button id="backBtn" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--green)">Back</button>
+              </div>
+            </div>
+            <div class="small" style="margin-top:10px">All fields are required.</div>
+          </div>
+        </div>
+
+        <!-- Hunt screen (levels) -->
+        <div id="huntView" class="view hidden">
+          <div style="width:100%;max-width:680px;">
+            <div id="levelTitle" class="big">Level 1</div>
+            <div id="clueText" class="muted" style="margin-top:12px">Clue goes here</div>
+
+            <div style="margin-top:18px; display:flex; gap:10px; justify-content:center; align-items:center;">
+              <input id="codeInput" type="text" placeholder="Enter code" />
+              <button id="submitBtn" class="btn">Submit</button>
+            </div>
+
+            <div id="levelMsg" class="muted" style="margin-top:12px">Codes are numeric — enter <strong>1234</strong></div>
+          </div>
+        </div>
+
+        <!-- End screen -->
+        <div id="endView" class="view hidden">
+          <div style="width:100%;max-width:680px;">
+            <div class="big">🎉 Congratulations — You won!</div>
+            <div id="playerInfo" class="muted" style="margin-top:12px; text-align:left; white-space:pre-line;"></div>
+            <div class="muted" style="margin-top:14px">Share this screenshot with the Head to get your prize.</div>
+            <div style="margin-top:14px">
+              <button id="restartBtn" class="btn">Restart</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="footer">
+        <div>Progress saved locally</div>
+        <div class="small">VertechX</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ====== Simple config (3 levels, all codes = "1234") ====== */
+const levels = [
+  { clue: "Library — check the entrance poster.", code: "1234" },
+  { clue: "Lonely Tree — check the base of the campus 'Lonely Tree'.", code: "1234" },
+  { clue: "Ask Anita ma'am for the code.", code: "1234" }
+];
+
+/* ====== basic app state via localStorage ====== */
+let state = {
+  currentLevel: parseInt(localStorage.getItem('vt_level')) || 0,
+  player: JSON.parse(localStorage.getItem('vt_player') || 'null')
+};
+
+/* ====== elements ====== */
+const startView = document.getElementById('startView');
+const formView = document.getElementById('formView');
+const huntView = document.getElementById('huntView');
+const endView = document.getElementById('endView');
+
+const openFormBtn = document.getElementById('openForm');
+const startBtn = document.getElementById('startBtn');
+const backBtn = document.getElementById('backBtn');
+
+const p_name = document.getElementById('p_name');
+const p_section = document.getElementById('p_section');
+const p_year = document.getElementById('p_year');
+const p_branch = document.getElementById('p_branch');
+
+const levelTitle = document.getElementById('levelTitle');
+const clueText = document.getElementById('clueText');
+const codeInput = document.getElementById('codeInput');
+const submitBtn = document.getElementById('submitBtn');
+const levelMsg = document.getElementById('levelMsg');
+
+const playerInfo = document.getElementById('playerInfo');
+const restartBtn = document.getElementById('restartBtn');
+
+/* ====== helper UI toggles ====== */
+function show(view){
+  [startView, formView, huntView, endView].forEach(v => v.classList.add('hidden'));
+  view.classList.remove('hidden');
+}
+
+/* ====== minimal beep (optional) ====== */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+const audioCtx = AudioCtx ? new AudioCtx() : null;
+function beep(freq=880,t=0.08){
+  if(!audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sine';
+  o.frequency.value = freq;
+  g.gain.value = 0.04;
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + t);
+  o.stop(audioCtx.currentTime + t + 0.02);
+}
+
+/* ====== flow handlers ====== */
+openFormBtn.addEventListener('click', ()=> show(formView));
+backBtn.addEventListener('click', ()=> show(startView));
+
+startBtn.addEventListener('click', ()=>{
+  const name = p_name.value.trim();
+  const section = p_section.value.trim();
+  const year = p_year.value.trim();
+  const branch = p_branch.value.trim();
+  if(!name || !section || !year || !branch){
+    alert('Please fill all fields.');
+    return;
+  }
+  // save
+  state.player = { name, section, year, branch };
+  localStorage.setItem('vt_player', JSON.stringify(state.player));
+  state.currentLevel = 0;
+  localStorage.setItem('vt_level', state.currentLevel);
+  show(huntView);
+  renderLevel();
+  codeInput.focus();
+});
+
+/* render level simple */
+function renderLevel(){
+  if(state.currentLevel >= levels.length){
+    // finished
+    show(endView);
+    renderEnd();
+    return;
+  }
+  levelTitle.textContent = 'Level ' + (state.currentLevel + 1);
+  clueText.textContent = levels[state.currentLevel].clue;
+  levelMsg.textContent = 'Enter code (numeric)';
+  codeInput.value = '';
+  codeInput.focus();
+}
+
+/* check code */
+function checkCode(){
+  const val = (codeInput.value || '').trim();
+  if(!val){
+    alert('Enter the code.');
+    return;
+  }
+  // codes are simple string '1234'
+  if(val.toUpperCase() === levels[state.currentLevel].code.toUpperCase()){
+    // correct
+    beep(880,0.06);
+    state.currentLevel++;
+    localStorage.setItem('vt_level', state.currentLevel);
+    if(state.currentLevel >= levels.length){
+      show(endView);
+      renderEnd();
+    } else {
+      // small minimal message + next level
+      renderLevel();
+    }
+  } else {
+    // wrong
+    beep(220,0.12);
+    alert('Wrong code — try again.');
+    codeInput.focus();
+  }
+}
+
+/* final screen */
+function renderEnd(){
+  const p = state.player || { name:'Unknown', section:'-', year:'-', branch:'-'};
+  const infoText = `Name: ${p.name}\nSection: ${p.section}\nYear: ${p.year}\nBranch: ${p.branch}\n\nYou have completed the VertechX Treasure Hunt.`;
+  playerInfo.textContent = infoText;
+}
+
+/* restart */
+restartBtn.addEventListener('click', ()=>{
+  localStorage.removeItem('vt_level');
+  localStorage.removeItem('vt_player');
+  state = { currentLevel:0, player:null };
+  // clear form
+  p_name.value=''; p_section.value=''; p_year.value=''; p_branch.value='';
+  show(startView);
+});
+
+/* submit via button / enter */
+submitBtn.addEventListener('click', checkCode);
+codeInput.addEventListener('keydown', e => { if(e.key === 'Enter') checkCode(); });
+
+/* initial view logic */
+if(state.player && state.currentLevel >= 0 && state.currentLevel < levels.length){
+  // resume in-house: show hunt
+  show(huntView);
+  renderLevel();
+} else if(state.player && state.currentLevel >= levels.length){
+  // already finished
+  show(endView);
+  renderEnd();
+} else {
+  // fresh
+  show(startView);
+}
+
+/* make it easy to close overlays on mobile if needed */
+document.addEventListener('visibilitychange', ()=>{ /* no-op */ });
+
+</script>
+</body>
+</html>
