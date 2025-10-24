@@ -67,7 +67,8 @@
   /* level box */
   .level-box{display:flex;flex-direction:column;gap:12px;align-items:center}
   .level-title{font-weight:700;color:var(--glow);font-size:12px}
-  .clue{background:rgba(0,0,0,0.35);padding:14px;border-radius:8px;color:var(--glow);line-height:1.6;max-width:720px}
+  /* smaller clue font so long riddles fit */
+  .clue{background:rgba(0,0,0,0.35);padding:12px;border-radius:8px;color:var(--glow);line-height:1.45;max-width:720px;font-size:11px;text-align:left}
   .code-row{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:10px}
   .code-input{padding:12px;border-radius:6px;border:2px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.4);color:var(--glow);font-family:inherit;font-size:12px;width:200px}
 
@@ -79,7 +80,7 @@
 
   /* final box */
   .final-box{display:flex;flex-direction:column;gap:10px;align-items:center}
-  .info{background:rgba(0,0,0,0.28);padding:12px;border-radius:8px;color:var(--glow);white-space:pre-line;max-width:720px}
+  .info{background:rgba(0,0,0,0.28);padding:12px;border-radius:8px;color:var(--glow);white-space:pre-line;max-width:720px;font-size:11px}
 
   .footer{position:absolute;left:18px;right:18px;bottom:12px;display:flex;justify-content:space-between;color:var(--muted);font-size:11px}
 
@@ -88,7 +89,7 @@
     .panel{height:96vh;padding:14px;border-radius:6px}
     .title{font-size:14px}
     .pill{min-width:120px;padding:10px}
-    .clue{padding:12px}
+    .clue{padding:10px;font-size:10px}
     .form input{padding:10px}
   }
 </style>
@@ -156,7 +157,7 @@
           <div class="big">🎉 CONGRATULATIONS — YOU WON!</div>
           <div class="info" id="playerInfo">Name: ...</div>
           <div class="muted">Share this screenshot with the Head to collect your prize.</div>
-          <!-- restart intentionally removed -->
+          <!-- no restart here -->
         </div>
       </div>
 
@@ -170,27 +171,74 @@
 </div>
 
 <script>
-/* ---------- paths (3 steps each) ---------- */
-/* All codes for testing are '1234'. Replace when ready. */
+/* ---------- updated paths + common sequence exactly per your instruction ---------- */
+/* All codes for testing are '1234'. Replace with final codes before event. */
+
 const paths = {
+  // RED path — first step riddle (The Watcher) leads to Lonely Tree (not named)
   red: [
-    { title:'Library — Entrance poster', riddle:"Visit the library entrance poster. Look for a small sticker with the code.", code:'1234' },
-    { title:'Lonely Tree', riddle:"Go to the campus 'Lonely Tree' and check around its base for the code.", code:'1234' },
-    { title:'Basketball Board', riddle:"Find the notice board near the basketball court — the code is pinned there.", code:'1234' }
+    {
+      title: 'The Watcher',
+      riddle: `I stand apart, a watcher of all,
+Beneath my shade, the shadows fall.
+Alone I grow, yet secrets I keep —
+Find me where silence dares to sleep.`,
+      code: '1234'
+    },
+    {
+      title: 'Canteen Notice Board',
+      riddle: `Where hunger fades and chatter flows,
+Beside the scent that tempts your nose.
+Among the plates and laughter stored,
+Lies your sign upon the board.`,
+      code: '1234'
+    },
+    {
+      title: 'Basketball Board',
+      riddle: `Where echoes bounce and players call,
+Aim the basket, chase the ball.
+Cheers arise and dreams rebound —
+Your next clue waits on this ground.`,
+      code: '1234'
+    }
   ],
+  // BLUE path
   blue: [
-    { title:'VertechX logo spot', riddle:"Find the VertechX display area and look for a hidden sticker with a code.", code:'1234' },
-    { title:'Auditorium miniature', riddle:"Locate the miniature model of our college campus (near the auditorium) and check it for a code.", code:'1234' },
-    { title:'Basketball Board', riddle:"Find the notice board near the basketball court — the code is pinned there.", code:'1234' }
+    {
+      title: 'VertechX Logo Spot',
+      riddle: `Find the VertechX display area and look for a hidden sticker with a code.`,
+      code: '1234'
+    },
+    {
+      title: 'Auditorium Miniature',
+      riddle: `I mirror walls both big and tall,
+Yet fit within a frame so small.
+A tiny world, both neat and whole —
+Seek the model that shows it all.`,
+      code: '1234'
+    },
+    {
+      title: 'Basketball Board',
+      riddle: `Where echoes bounce and players call,
+Aim the basket, chase the ball.
+Cheers arise and dreams rebound —
+Your next clue waits on this ground.`,
+      code: '1234'
+    }
   ]
 };
 
-/* ---------- common path that both pills share after their 3 steps ---------- */
+/* ---------- common path (exact order requested):
+   After basketball -> Teacher Help -> Notice poem -> Opposite room 139 -> Broken cabinet (finish)
+*/
 const commonPath = [
-  { title:'Teacher Help', riddle:"Ask a teacher (e.g. Anita ma'am) for the next code — they will help you.", code:'1234' },
-  { title:'Room 002', riddle:"Go to Room 002 and check near the door or notice board for the next code.", code:'1234' },
-  { title:'Notice Board (opposite 96/130)', riddle:"Find the notice board opposite rooms 96/130 and look for the code.", code:'1234' },
-  { title:'Broken Cabinet (Entrance) — Finish', riddle:"The final code is hidden in the broken cabinet near the main entrance — that's the finish.", code:'1234' }
+  { title: 'Teacher Help', riddle: `Ask a teacher (e.g. Anita ma'am) for the next code — they will help you.`, code: '1234' },
+  { title: 'Notice Board (poem)', riddle: `Dreams are pinned where futures start,
+Admission hopes and notice art.
+Seek the board where goals are scored —
+Your clue awaits upon the board.`, code: '1234' },
+  { title: 'Notice Board (location hint)', riddle: `It sits opposite room 139.`, code: '1234' },
+  { title: 'Broken Cabinet (Entrance) — Finish', riddle: `Broken at the beginning lies another clue.`, code: '1234' }
 ];
 
 /* ---------- state & elements ---------- */
@@ -252,7 +300,7 @@ function beginFromForm(){
     alert('Please fill all fields.');
     return;
   }
-  if(!/^\d+$/.test(year) || parseInt(year)<1 || parseInt(year)>6){ alert('Enter a valid year (1-6). return;'); return; }
+  if(!/^\d+$/.test(year) || parseInt(year)<1 || parseInt(year)>6){ alert('Enter a valid year (1-6).'); return; }
   state.player = { name, section, year, branch };
   state.level = 0;
   localStorage.setItem('vt_player', JSON.stringify(state.player));
@@ -262,7 +310,7 @@ function beginFromForm(){
   show('view-hunt');
 }
 
-/* ---------- combined path logic ---------- */
+/* ---------- combined path logic (path-specific steps + commonPath) ---------- */
 function getPath(){
   const base = state.chosen === 'blue' ? paths.blue : paths.red;
   return base.concat(commonPath);
@@ -276,7 +324,8 @@ function renderLevel(){
   }
   const step = path[state.level];
   $('levelTitle').textContent = `Level ${state.level+1} of ${path.length} — ${step.title}`;
-  $('clueBox').textContent = step.riddle;
+  // render riddle with line-breaks
+  $('clueBox').innerHTML = (step.riddle || '').replace(/\n/g, '<br>');
   $('hintSmall').textContent = `Enter the code found at the location (test code: 1234)`;
   $('codeIn').value = '';
   $('codeIn').focus();
@@ -304,8 +353,6 @@ function renderEnd(){
   const p = state.player || { name:'-', section:'-', year:'-', branch:'-'};
   $('playerInfo').textContent = `Name: ${p.name}\nSection: ${p.section}\nYear: ${p.year}\nBranch: ${p.branch}\nPath chosen: ${state.chosen ? state.chosen.toUpperCase() : '-'}`;
 }
-
-/* ---------- restart removed intentionally ---------- */
 
 /* ---------- init ---------- */
 (function init(){
