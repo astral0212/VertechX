@@ -3,281 +3,328 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>VertechX — MVJ Treasure Hunt</title>
+<title>VertechX — Pixel Treasure Hunt</title>
+
+<!-- Pixel font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 <style>
   :root{
-    --bg:#000;
-    --green:#36ff6b;
-    --muted: rgba(54,255,107,0.18);
+    --bg0:#050507;
+    --bg1:#02110a;
+    --glow: #3af17a;
+    --muted: rgba(58,241,122,0.22);
+    --panel: rgba(0,0,0,0.55);
+    --accent-red:#ff6565;
+    --accent-blue:#61b8ff;
   }
-  html,body{ height:100%; margin:0; background:#000; font-family:"Press Start 2P",monospace; color:var(--green); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
-  .wrap{ height:100vh; display:flex; align-items:center; justify-content:center; padding:12px; box-sizing:border-box; }
-  .card{
-    width:920px; max-width:100%; height:86vh; max-height:980px; background:linear-gradient(180deg,#020202,#07100a); border-radius:10px; padding:18px; box-shadow:0 20px 60px rgba(0,0,0,0.7); display:flex; flex-direction:column; gap:12px;
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg0),var(--bg1));font-family:"Press Start 2P",monospace;color:var(--glow);-webkit-font-smoothing:antialiased}
+  .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
+  /* CRT panel */
+  .panel{
+    width:980px;max-width:100%;height:86vh;max-height:980px;border-radius:8px;padding:18px;background:linear-gradient(180deg, rgba(0,0,0,0.85), rgba(0,0,0,0.78));
+    box-shadow: 0 28px 100px rgba(0,0,0,0.7), inset 0 2px 0 rgba(255,255,255,0.02);
+    position:relative;overflow:hidden; border: 2px solid rgba(58,241,122,0.04);
   }
-  .header { display:flex; flex-direction:column; gap:6px; }
-  .title { font-size:16px; color:var(--green); }
-  .subtitle { font-size:10px; color:var(--muted); letter-spacing:1px; }
-  .screen{ flex:1; background:rgba(0,0,0,0.45); border-radius:8px; padding:18px; overflow:auto; display:flex; align-items:center; justify-content:center; text-align:center; }
-  .screen .big { font-size:13px; line-height:1.5; }
-  .controls { display:flex; gap:10px; align-items:center; justify-content:center; }
-  input[type="text"], input[type="number"]{
-    background:rgba(0,0,0,0.7); color:var(--green); border:1px solid rgba(54,255,107,0.06); padding:10px 12px; border-radius:6px; font-family:inherit; font-size:11px;
+  /* scanlines (pixel CRT) */
+  .panel::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 100% 4px;mix-blend-mode:overlay;opacity:0.6;
   }
-  .btn { padding:12px 14px; border-radius:8px; border:none; background:linear-gradient(90deg,#36ff6b,#1fbf6a); color:#012108; font-weight:700; cursor:pointer; font-family:inherit; text-transform:uppercase; font-size:11px; }
-  .muted { color:var(--muted); font-size:10px; margin-top:8px; }
-  .small { font-size:10px; color:var(--muted); }
-  .footer { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); }
-  .hidden{ display:none !important; }
-  @media (max-width:640px){
-    .card { height:95vh; padding:12px; }
-    .title { font-size:12px; }
-    .screen .big { font-size:11px; }
-    .btn { padding:10px 12px; font-size:10px; }
+
+  .head{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+  .title{color:var(--glow);font-size:16px}
+  .subtitle{color:var(--muted);font-size:10px;letter-spacing:1px}
+
+  .screen{height:calc(100% - 64px);background:var(--panel);border-radius:6px;padding:18px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;overflow:auto}
+  .view{width:100%;max-width:760px}
+
+  /* pixel buttons */
+  .pill-row{display:flex;gap:18px;justify-content:center;margin-top:20px}
+  .pill{
+    min-width:140px;padding:12px 14px;border-radius:6px;cursor:pointer;border:none;font-weight:700;font-size:12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.55), inset 0 -6px 0 rgba(0,0,0,0.12);
+    image-rendering: pixelated;
+  }
+  .pill.red{background:linear-gradient(180deg,var(--accent-red),#d94d4d);color:#fff;filter:contrast(120%)}
+  .pill.blue{background:linear-gradient(180deg,var(--accent-blue),#318fd6);color:#fff}
+
+  .big{font-size:13px;line-height:1.6}
+  .muted{color:var(--muted);font-size:11px;margin-top:8px}
+
+  /* form */
+  .form{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:12px}
+  .form input{width:100%;max-width:420px;padding:11px;border-radius:6px;border:2px solid rgba(0,0,0,0.4);background:rgba(0,0,0,0.45);color:var(--glow);font-family:inherit;font-size:12px}
+  .actions{display:flex;gap:12px;justify-content:center;margin-top:12px}
+  .btn{
+    padding:11px 14px;border-radius:6px;border:none;background:linear-gradient(90deg,#44ff9e,#2fb76b);color:#032108;cursor:pointer;font-weight:700;font-size:12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  .btn.ghost{background:transparent;border:2px solid rgba(255,255,255,0.04);color:var(--muted);}
+
+  /* level box */
+  .level-box{display:flex;flex-direction:column;gap:12px;align-items:center}
+  .level-title{font-weight:700;color:var(--glow);font-size:12px}
+  .clue{background:rgba(0,0,0,0.35);padding:14px;border-radius:8px;color:var(--glow);line-height:1.6;max-width:720px}
+  .code-row{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:10px}
+  .code-input{padding:12px;border-radius:6px;border:2px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.4);color:var(--glow);font-family:inherit;font-size:12px;width:200px}
+
+  /* pixel cursor */
+  .pixel-cursor{
+    width:10px;height:16px;background:var(--glow);display:inline-block;margin-left:6px;animation:blink 900ms steps(1) infinite;box-shadow:0 0 10px rgba(58,241,122,0.6)
+  }
+  @keyframes blink{50%{opacity:0}}
+
+  /* final box */
+  .final-box{display:flex;flex-direction:column;gap:10px;align-items:center}
+  .info{background:rgba(0,0,0,0.28);padding:12px;border-radius:8px;color:var(--glow);white-space:pre-line;max-width:720px}
+
+  .footer{position:absolute;left:18px;right:18px;bottom:12px;display:flex;justify-content:space-between;color:var(--muted);font-size:11px}
+
+  /* responsive */
+  @media (max-width:760px){
+    .panel{height:96vh;padding:14px;border-radius:6px}
+    .title{font-size:14px}
+    .pill{min-width:120px;padding:10px}
+    .clue{padding:12px}
+    .form input{padding:10px}
   }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card" role="application" aria-label="Treasure Hunt">
+<div class="wrap">
+  <div class="panel" role="application" aria-label="VertechX Pixel Treasure Hunt">
+    <div class="head">
+      <div class="title">VERTECHX — MVJ COLLEGE OF ENGINEERING</div>
+      <div class="subtitle">Pixel Terminal — Choose a pill to begin</div>
+    </div>
 
-      <div class="header">
-        <div class="title">VERTECHX — MVJ COLLEGE OF ENGINEERING</div>
-        <div class="subtitle">TREASURE HUNT</div>
+    <div class="screen" id="screen">
+      <!-- views -->
+      <div id="view-start" class="view">
+        <div class="big">Choose your path — red pill or blue pill</div>
+        <div class="muted">Each pill gives a different sequence of clues. Pick one to start.</div>
+        <div class="pill-row">
+          <button class="pill red" id="chooseRed">RED PILL</button>
+          <button class="pill blue" id="chooseBlue">BLUE PILL</button>
+        </div>
+        <div style="margin-top:18px;color:var(--muted);font-size:11px">Progress saved locally · Codes for test = <strong>1234</strong></div>
       </div>
 
-      <!-- Main screen area -->
-      <div class="screen" id="screen">
-        <!-- START overlay with "Get Started" -->
-        <div id="startView" class="view">
-          <div>
-            <div class="big">Get started with the Treasure Hunt</div>
-            <div class="muted" style="margin-top:14px">Press the button to enter your details</div>
-            <div style="margin-top:18px">
-              <button id="openForm" class="btn">Get Started</button>
-            </div>
-          </div>
+      <div id="view-choose" class="view" style="display:none">
+        <div class="big" id="chooseMsg">You chose RED PILL</div>
+        <div class="muted">Ready to enter participant details and begin?</div>
+        <div class="actions">
+          <button class="btn" id="toForm">Continue</button>
+          <button class="btn ghost" id="backStart">Back</button>
         </div>
-
-        <!-- Participant form -->
-        <div id="formView" class="view hidden">
-          <div style="width:100%;max-width:520px;">
-            <div class="big">Enter your details</div>
-            <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
-              <input id="p_name" type="text" placeholder="Full name" />
-              <input id="p_section" type="text" placeholder="Section (e.g. A1)" />
-              <input id="p_year" type="number" inputmode="numeric" min="1" max="6" placeholder="Year (e.g. 2)" />
-              <input id="p_branch" type="text" placeholder="Branch (e.g. CSE)" />
-              <div style="margin-top:10px; display:flex; gap:10px; justify-content:center;">
-                <button id="startBtn" class="btn">Start Hunt</button>
-                <button id="backBtn" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--green)">Back</button>
-              </div>
-            </div>
-            <div class="small" style="margin-top:10px">All fields are required.</div>
-          </div>
-        </div>
-
-        <!-- Hunt screen (levels) -->
-        <div id="huntView" class="view hidden">
-          <div style="width:100%;max-width:680px;">
-            <div id="levelTitle" class="big">Level 1</div>
-            <div id="clueText" class="muted" style="margin-top:12px">Clue goes here</div>
-
-            <div style="margin-top:18px; display:flex; gap:10px; justify-content:center; align-items:center;">
-              <input id="codeInput" type="text" placeholder="Enter code" />
-              <button id="submitBtn" class="btn">Submit</button>
-            </div>
-
-            <div id="levelMsg" class="muted" style="margin-top:12px">Codes are numeric — enter <strong>1234</strong></div>
-          </div>
-        </div>
-
-        <!-- End screen -->
-        <div id="endView" class="view hidden">
-          <div style="width:100%;max-width:680px;">
-            <div class="big">🎉 Congratulations — You won!</div>
-            <div id="playerInfo" class="muted" style="margin-top:12px; text-align:left; white-space:pre-line;"></div>
-            <div class="muted" style="margin-top:14px">Share this screenshot with the Head to get your prize.</div>
-            <div style="margin-top:14px">
-              <button id="restartBtn" class="btn">Restart</button>
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <div class="footer">
-        <div>Progress saved locally</div>
-        <div class="small">VertechX</div>
+      <div id="view-form" class="view" style="display:none">
+        <div class="big">Participant Info (required)</div>
+        <div class="form">
+          <input id="pf_name" placeholder="Full name" />
+          <input id="pf_section" placeholder="Section (e.g. A1)" />
+          <input id="pf_year" placeholder="Year (1-6)" type="number" min="1" max="6" />
+          <input id="pf_branch" placeholder="Branch (e.g. CSE)" />
+          <div class="actions">
+            <button class="btn" id="startHunt">Start Hunt</button>
+            <button class="btn ghost" id="cancelForm">Cancel</button>
+          </div>
+        </div>
       </div>
+
+      <div id="view-hunt" class="view" style="display:none">
+        <div class="level-box">
+          <div class="level-title" id="levelTitle">Level 1 of X</div>
+          <div class="clue" id="clueBox">Clue text appears here</div>
+
+          <div class="code-row">
+            <input id="codeIn" class="code-input" placeholder="Enter code (1234)" />
+            <button class="btn" id="submitCode">SUBMIT</button>
+            <div class="pixel-cursor" title="pixel cursor"></div>
+          </div>
+
+          <div class="muted" id="hintSmall">Enter the code you find at the spot</div>
+        </div>
+      </div>
+
+      <div id="view-end" class="view" style="display:none">
+        <div class="final-box">
+          <div class="big">🎉 CONGRATULATIONS — YOU WON!</div>
+          <div class="info" id="playerInfo">Name: ...</div>
+          <div class="muted">Share this screenshot with the Head to collect your prize.</div>
+          <!-- restart intentionally removed -->
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <div>VertechX — Pixel Mode</div>
+      <div>Progress stored locally</div>
     </div>
   </div>
+</div>
 
 <script>
-/* ====== Simple config (3 levels, all codes = "1234") ====== */
-const levels = [
-  { clue: "Library — check the entrance poster.", code: "1234" },
-  { clue: "Lonely Tree — check the base of the campus 'Lonely Tree'.", code: "1234" },
-  { clue: "Ask Anita ma'am for the code.", code: "1234" }
-];
-
-/* ====== basic app state via localStorage ====== */
-let state = {
-  currentLevel: parseInt(localStorage.getItem('vt_level')) || 0,
-  player: JSON.parse(localStorage.getItem('vt_player') || 'null')
+/* ---------- paths (3 steps each) ---------- */
+/* All codes for testing are '1234'. Replace when ready. */
+const paths = {
+  red: [
+    { title:'Library — Entrance poster', riddle:"Visit the library entrance poster. Look for a small sticker with the code.", code:'1234' },
+    { title:'Lonely Tree', riddle:"Go to the campus 'Lonely Tree' and check around its base for the code.", code:'1234' },
+    { title:'Basketball Board', riddle:"Find the notice board near the basketball court — the code is pinned there.", code:'1234' }
+  ],
+  blue: [
+    { title:'VertechX logo spot', riddle:"Find the VertechX display area and look for a hidden sticker with a code.", code:'1234' },
+    { title:'Auditorium miniature', riddle:"Locate the miniature model of our college campus (near the auditorium) and check it for a code.", code:'1234' },
+    { title:'Basketball Board', riddle:"Find the notice board near the basketball court — the code is pinned there.", code:'1234' }
+  ]
 };
 
-/* ====== elements ====== */
-const startView = document.getElementById('startView');
-const formView = document.getElementById('formView');
-const huntView = document.getElementById('huntView');
-const endView = document.getElementById('endView');
+/* ---------- common path that both pills share after their 3 steps ---------- */
+const commonPath = [
+  { title:'Teacher Help', riddle:"Ask a teacher (e.g. Anita ma'am) for the next code — they will help you.", code:'1234' },
+  { title:'Room 002', riddle:"Go to Room 002 and check near the door or notice board for the next code.", code:'1234' },
+  { title:'Notice Board (opposite 96/130)', riddle:"Find the notice board opposite rooms 96/130 and look for the code.", code:'1234' },
+  { title:'Broken Cabinet (Entrance) — Finish', riddle:"The final code is hidden in the broken cabinet near the main entrance — that's the finish.", code:'1234' }
+];
 
-const openFormBtn = document.getElementById('openForm');
-const startBtn = document.getElementById('startBtn');
-const backBtn = document.getElementById('backBtn');
+/* ---------- state & elements ---------- */
+let state = {
+  chosen: localStorage.getItem('vt_chosen') || null,
+  player: JSON.parse(localStorage.getItem('vt_player') || 'null'),
+  level: parseInt(localStorage.getItem('vt_level') || '0')
+};
 
-const p_name = document.getElementById('p_name');
-const p_section = document.getElementById('p_section');
-const p_year = document.getElementById('p_year');
-const p_branch = document.getElementById('p_branch');
+const $ = id => document.getElementById(id);
 
-const levelTitle = document.getElementById('levelTitle');
-const clueText = document.getElementById('clueText');
-const codeInput = document.getElementById('codeInput');
-const submitBtn = document.getElementById('submitBtn');
-const levelMsg = document.getElementById('levelMsg');
+/* ---------- UI wiring ---------- */
+$('chooseRed').addEventListener('click', ()=> pick('red'));
+$('chooseBlue').addEventListener('click', ()=> pick('blue'));
+$('backStart').addEventListener('click', ()=> show('view-start'));
+$('toForm').addEventListener('click', ()=> show('view-form'));
+$('cancelForm').addEventListener('click', ()=> show('view-choose'));
+$('startHunt').addEventListener('click', beginFromForm);
+$('submitCode').addEventListener('click', submitCode);
+$('codeIn').addEventListener('keydown', e=> { if(e.key==='Enter') submitCode(); });
 
-const playerInfo = document.getElementById('playerInfo');
-const restartBtn = document.getElementById('restartBtn');
-
-/* ====== helper UI toggles ====== */
-function show(view){
-  [startView, formView, huntView, endView].forEach(v => v.classList.add('hidden'));
-  view.classList.remove('hidden');
-}
-
-/* ====== minimal beep (optional) ====== */
+/* ---------- audio (tiny 8-bit style) ---------- */
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 const audioCtx = AudioCtx ? new AudioCtx() : null;
-function beep(freq=880,t=0.08){
+function tone(freq,len=0.08,type='square'){
   if(!audioCtx) return;
   const o = audioCtx.createOscillator();
   const g = audioCtx.createGain();
-  o.type = 'sine';
-  o.frequency.value = freq;
-  g.gain.value = 0.04;
+  o.type = type; o.frequency.value = freq;
+  g.gain.value = 0.06;
   o.connect(g); g.connect(audioCtx.destination);
   o.start();
-  g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + t);
-  o.stop(audioCtx.currentTime + t + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + len);
+  o.stop(audioCtx.currentTime + len + 0.02);
+}
+function good(){ tone(880,0.08); setTimeout(()=>tone(1200,0.08),90); }
+function bad(){ tone(200,0.14,'sawtooth'); }
+
+/* ---------- view helpers ---------- */
+function show(id){
+  ['view-start','view-choose','view-form','view-hunt','view-end'].forEach(v => { $(v).style.display = (v===id ? 'block' : 'none'); });
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* ====== flow handlers ====== */
-openFormBtn.addEventListener('click', ()=> show(formView));
-backBtn.addEventListener('click', ()=> show(startView));
+/* ---------- pick and form ---------- */
+function pick(color){
+  state.chosen = color;
+  localStorage.setItem('vt_chosen', color);
+  $('chooseMsg').textContent = `You chose ${color.toUpperCase()} PILL`;
+  show('view-choose');
+}
 
-startBtn.addEventListener('click', ()=>{
-  const name = p_name.value.trim();
-  const section = p_section.value.trim();
-  const year = p_year.value.trim();
-  const branch = p_branch.value.trim();
+function beginFromForm(){
+  const name = $('pf_name').value.trim();
+  const section = $('pf_section').value.trim();
+  const year = $('pf_year').value.trim();
+  const branch = $('pf_branch').value.trim();
   if(!name || !section || !year || !branch){
     alert('Please fill all fields.');
     return;
   }
-  // save
+  if(!/^\d+$/.test(year) || parseInt(year)<1 || parseInt(year)>6){ alert('Enter a valid year (1-6). return;'); return; }
   state.player = { name, section, year, branch };
+  state.level = 0;
   localStorage.setItem('vt_player', JSON.stringify(state.player));
-  state.currentLevel = 0;
-  localStorage.setItem('vt_level', state.currentLevel);
-  show(huntView);
+  localStorage.setItem('vt_level', state.level.toString());
+  localStorage.setItem('vt_chosen', state.chosen);
   renderLevel();
-  codeInput.focus();
-});
+  show('view-hunt');
+}
 
-/* render level simple */
+/* ---------- combined path logic ---------- */
+function getPath(){
+  const base = state.chosen === 'blue' ? paths.blue : paths.red;
+  return base.concat(commonPath);
+}
+
+/* ---------- level render & submit ---------- */
 function renderLevel(){
-  if(state.currentLevel >= levels.length){
-    // finished
-    show(endView);
-    renderEnd();
-    return;
+  const path = getPath();
+  if(state.level >= path.length){
+    renderEnd(); show('view-end'); return;
   }
-  levelTitle.textContent = 'Level ' + (state.currentLevel + 1);
-  clueText.textContent = levels[state.currentLevel].clue;
-  levelMsg.textContent = 'Enter code (numeric)';
-  codeInput.value = '';
-  codeInput.focus();
+  const step = path[state.level];
+  $('levelTitle').textContent = `Level ${state.level+1} of ${path.length} — ${step.title}`;
+  $('clueBox').textContent = step.riddle;
+  $('hintSmall').textContent = `Enter the code found at the location (test code: 1234)`;
+  $('codeIn').value = '';
+  $('codeIn').focus();
 }
 
-/* check code */
-function checkCode(){
-  const val = (codeInput.value || '').trim();
-  if(!val){
-    alert('Enter the code.');
-    return;
-  }
-  // codes are simple string '1234'
-  if(val.toUpperCase() === levels[state.currentLevel].code.toUpperCase()){
-    // correct
-    beep(880,0.06);
-    state.currentLevel++;
-    localStorage.setItem('vt_level', state.currentLevel);
-    if(state.currentLevel >= levels.length){
-      show(endView);
-      renderEnd();
-    } else {
-      // small minimal message + next level
-      renderLevel();
-    }
+function submitCode(){
+  const val = ($('codeIn').value || '').trim();
+  if(!val){ alert('Enter the code.'); return; }
+  const expected = getPath()[state.level].code;
+  if(val.toUpperCase() === expected.toUpperCase()){
+    good();
+    state.level++;
+    localStorage.setItem('vt_level', state.level.toString());
+    if(state.level >= getPath().length){ renderEnd(); show('view-end'); }
+    else renderLevel();
   } else {
-    // wrong
-    beep(220,0.12);
-    alert('Wrong code — try again.');
-    codeInput.focus();
+    bad();
+    alert('Incorrect code — try again.');
+    $('codeIn').focus();
   }
 }
 
-/* final screen */
+/* ---------- end ---------- */
 function renderEnd(){
-  const p = state.player || { name:'Unknown', section:'-', year:'-', branch:'-'};
-  const infoText = `Name: ${p.name}\nSection: ${p.section}\nYear: ${p.year}\nBranch: ${p.branch}\n\nYou have completed the VertechX Treasure Hunt.`;
-  playerInfo.textContent = infoText;
+  const p = state.player || { name:'-', section:'-', year:'-', branch:'-'};
+  $('playerInfo').textContent = `Name: ${p.name}\nSection: ${p.section}\nYear: ${p.year}\nBranch: ${p.branch}\nPath chosen: ${state.chosen ? state.chosen.toUpperCase() : '-'}`;
 }
 
-/* restart */
-restartBtn.addEventListener('click', ()=>{
-  localStorage.removeItem('vt_level');
-  localStorage.removeItem('vt_player');
-  state = { currentLevel:0, player:null };
-  // clear form
-  p_name.value=''; p_section.value=''; p_year.value=''; p_branch.value='';
-  show(startView);
-});
+/* ---------- restart removed intentionally ---------- */
 
-/* submit via button / enter */
-submitBtn.addEventListener('click', checkCode);
-codeInput.addEventListener('keydown', e => { if(e.key === 'Enter') checkCode(); });
-
-/* initial view logic */
-if(state.player && state.currentLevel >= 0 && state.currentLevel < levels.length){
-  // resume in-house: show hunt
-  show(huntView);
-  renderLevel();
-} else if(state.player && state.currentLevel >= levels.length){
-  // already finished
-  show(endView);
-  renderEnd();
-} else {
-  // fresh
-  show(startView);
-}
-
-/* make it easy to close overlays on mobile if needed */
-document.addEventListener('visibilitychange', ()=>{ /* no-op */ });
-
+/* ---------- init ---------- */
+(function init(){
+  // If mid-hunt with player & chosen, resume
+  if(state.player && state.chosen){
+    const path = getPath();
+    if(state.level < path.length){
+      renderLevel();
+      show('view-hunt');
+      return;
+    } else {
+      renderEnd();
+      show('view-end');
+      return;
+    }
+  }
+  // default view
+  show('view-start');
+})();
 </script>
 </body>
 </html>
