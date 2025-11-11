@@ -102,7 +102,7 @@
             <div class="pixel-cursor" title="pixel cursor"></div>
           </div>
 
-          <div class="muted" id="hintSmall">Enter the code you find at each spot</div>
+          <div class="muted" id="hintSmall">Enter the code you find at the spot</div>
         </div>
       </div>
 
@@ -124,10 +124,10 @@
 </div>
 
 <script>
-/* Finalized mapping based on your picture + fixes:
-   Red: 1010, 2378, 5614
-   Blue: 1001, 7022, 5614
-   After Basketball (merged): Teacher Help (1997), Room 002 (1234 filler), Notice board poem (6769), Opposite room 139 hint (8012), Broken cabinet finish (3335)
+/* Final mapping (updated per your last request):
+   - Red: 1010, 2378, 5614
+   - Blue: 1001, 7022, 5614
+   - After Basketball (merged): College Entrance (1997), Notice board poem (6769), Opposite 139 hint (8012), Broken cabinet finish (3335)
 */
 
 const paths = {
@@ -182,16 +182,14 @@ Your next clue waits on this ground.`,
   ]
 };
 
-/* Common path after basketball, in order (matching your paper):
-   1) Teacher Help
-   2) Room 002 (Admission Room) — filler code 1234
-   3) Notice Board (poem)
-   4) Notice Board (location hint opposite room 139)
-   5) Broken Cabinet (finish)
+/* Common path after basketball (exact order from your paper):
+   1) College Entrance (was Teacher Help) — 1997
+   2) Notice Board (poem) — 6769
+   3) Notice Board (location hint opposite room 139) — 8012
+   4) Broken Cabinet (Entrance) — Finish — 3335
 */
 const commonPath = [
-  { title: 'Teacher Help', riddle: `Ask a teacher (e.g. Anita ma'am) or check with staff for the next clue.`, code: '1997' },
-  { title: 'Room 002 (Admission Room)', riddle: `Room 002 is the Admission Room — check near the desk or notice board for the next code.`, code: '1234' },
+  { title: 'College Entrance', riddle: `Check the college entrance for the clue.`, code: '1997' },
   { title: 'Notice Board (poem)', riddle: `Dreams are pinned where futures start,
 Admission hopes and notice art.
 Seek the board where goals are scored —
@@ -218,7 +216,7 @@ $('startHunt').addEventListener('click', beginFromForm);
 $('submitCode').addEventListener('click', submitCode);
 $('codeIn').addEventListener('keydown', e=> { if(e.key==='Enter') submitCode(); });
 
-/* sounds */
+/* audio */
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 const audioCtx = AudioCtx ? new AudioCtx() : null;
 function tone(freq,len=0.08,type='square'){ if(!audioCtx) return; const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = type; o.frequency.value = freq; g.gain.value = 0.06; o.connect(g); g.connect(audioCtx.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + len); o.stop(audioCtx.currentTime + len + 0.02); }
