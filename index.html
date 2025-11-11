@@ -4,9 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>VertechX — Pixel Treasure Hunt</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
 <style>
   :root{
     --bg0:#050507;
@@ -67,7 +65,6 @@
           <button class="pill red" id="chooseRed">RED PILL</button>
           <button class="pill blue" id="chooseBlue">BLUE PILL</button>
         </div>
-        <div style="margin-top:18px;color:var(--muted);font-size:11px">Progress saved locally · Codes are numeric</div>
       </div>
 
       <div id="view-choose" class="view" style="display:none">
@@ -101,9 +98,8 @@
           <div class="code-row">
             <input id="codeIn" class="code-input" placeholder="Enter code" />
             <button class="btn" id="submitCode">SUBMIT</button>
-            <div class="pixel-cursor" title="pixel cursor"></div>
+            <div class="pixel-cursor"></div>
           </div>
-
           <div class="muted" id="hintSmall">Enter the code you find at the spot</div>
         </div>
       </div>
@@ -115,172 +111,95 @@
           <div class="muted">Share this screenshot with the Head to collect your prize.</div>
         </div>
       </div>
-
-    </div>
-
-    <div class="footer">
-      <div>VertechX — Pixel Mode</div>
-      <div>Progress stored locally</div>
     </div>
   </div>
 </div>
 
 <script>
-/* ---------- final mapping: both paths merge at Basketball (5614) ---------- */
-
-/* Red codes: 1010, 2378, 5614
-   Blue codes: 1001, 7022, 5614  (basketball is 5614 here too)
-   Common codes after basketball: 1997, 6769, 1234, 1234
-*/
-
 const paths = {
   red: [
-    {
-      title: 'The Watcher',
-      riddle: `I stand apart, a watcher of all,
+    {riddle:`I stand apart, a watcher of all,
 Beneath my shade, the shadows fall.
 Alone I grow, yet secrets I keep —
-Find me where silence dares to sleep.`,
-      code: '1010'
-    },
-    {
-      title: 'Canteen Notice Board',
-      riddle: `Where hunger fades and chatter flows,
+Find me where silence dares to sleep.`,code:'1010'},
+    {riddle:`Where hunger fades and chatter flows,
 Beside the scent that tempts your nose.
 Among the plates and laughter stored,
-Lies your sign upon the board.`,
-      code: '2378'
-    },
-    {
-      title: 'Basketball Board',
-      riddle: `Where echoes bounce and players call,
+Lies your sign upon the board.`,code:'2378'},
+    {riddle:`Where echoes bounce and players call,
 Aim the basket, chase the ball.
 Cheers arise and dreams rebound —
-Your next clue waits on this ground.`,
-      code: '5614'
-    }
+Your next clue waits on this ground.`,code:'5614'}
   ],
   blue: [
-    {
-      title: 'VertechX Logo Spot',
-      riddle: `Find the VertechX display area and look for a hidden sticker with a code.`,
-      code: '1001'
-    },
-    {
-      title: 'Auditorium Miniature',
-      riddle: `I mirror walls both big and tall,
-Yet fit within a frame so small.
-A tiny world, both neat and whole —
-Seek the model that shows it all.`,
-      code: '7022'
-    },
-    {
-      title: 'Basketball Board',
-      riddle: `Where echoes bounce and players call,
+    {riddle:`Dreams are pinned where futures start,
+Admission hopes and notice art.
+Seek the board where goals are scored —
+Your clue awaits upon the board.`,code:'1001'},
+    {riddle:`It sits opposite room 139.`,code:'7022'},
+    {riddle:`Where echoes bounce and players call,
 Aim the basket, chase the ball.
 Cheers arise and dreams rebound —
-Your next clue waits on this ground.`,
-      code: '5614'
-    }
+Your next clue waits on this ground.`,code:'5614'}
   ]
 };
 
 const commonPath = [
-  { title: 'Entrance Gate', riddle: `Check the entrance gate of the college for the clue.`, code: '1997' },
-  { title: 'Notice Board (poem)', riddle: `Dreams are pinned where futures start,
+  {riddle:`Check the entrance gate of the college for the clue.`,code:'1997'},
+  {riddle:`Dreams are pinned where futures start,
 Admission hopes and notice art.
 Seek the board where goals are scored —
-Your clue awaits upon the board.`, code: '6769' },
-  { title: 'Notice Board (location hint)', riddle: `It sits opposite room 139.`, code: '1234' },
-  { title: 'Broken Cabinet (Entrance) — Finish', riddle: `Broken at the beginning lies another clue.`, code: '1234' }
+Your clue awaits upon the board.`,code:'6769'},
+  {riddle:`It sits opposite room 139.`,code:'8012'},
+  {riddle:`Broken at the beginning lies another clue.`,code:'3335'}
 ];
 
-/* ---------- state & elements ---------- */
-let state = {
-  chosen: localStorage.getItem('vt_chosen') || null,
-  player: JSON.parse(localStorage.getItem('vt_player') || 'null'),
-  level: parseInt(localStorage.getItem('vt_level') || '0')
-};
+let state={chosen:localStorage.getItem('vt_chosen')||null,player:JSON.parse(localStorage.getItem('vt_player')||'null'),level:parseInt(localStorage.getItem('vt_level')||'0')};
+const $=id=>document.getElementById(id);
 
-const $ = id => document.getElementById(id);
+$('chooseRed').onclick=()=>pick('red');
+$('chooseBlue').onclick=()=>pick('blue');
+$('backStart').onclick=()=>show('view-start');
+$('toForm').onclick=()=>show('view-form');
+$('cancelForm').onclick=()=>show('view-choose');
+$('startHunt').onclick=beginFromForm;
+$('submitCode').onclick=submitCode;
+$('codeIn').onkeydown=e=>{if(e.key==='Enter')submitCode();};
 
-/* ---------- UI wiring ---------- */
-$('chooseRed').addEventListener('click', ()=> pick('red'));
-$('chooseBlue').addEventListener('click', ()=> pick('blue'));
-$('backStart').addEventListener('click', ()=> show('view-start'));
-$('toForm').addEventListener('click', ()=> show('view-form'));
-$('cancelForm').addEventListener('click', ()=> show('view-choose'));
-$('startHunt').addEventListener('click', beginFromForm);
-$('submitCode').addEventListener('click', submitCode);
-$('codeIn').addEventListener('keydown', e=> { if(e.key==='Enter') submitCode(); });
+function show(id){['view-start','view-choose','view-form','view-hunt','view-end'].forEach(v=>$(v).style.display=v===id?'block':'none');}
 
-/* ---------- audio ---------- */
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-const audioCtx = AudioCtx ? new AudioCtx() : null;
-function tone(freq,len=0.08,type='square'){ if(!audioCtx) return; const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = type; o.frequency.value = freq; g.gain.value = 0.06; o.connect(g); g.connect(audioCtx.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + len); o.stop(audioCtx.currentTime + len + 0.02); }
-function good(){ tone(880,0.08); setTimeout(()=>tone(1200,0.08),90); }
-function bad(){ tone(200,0.14,'sawtooth'); }
-
-/* ---------- helpers ---------- */
-function show(id){ ['view-start','view-choose','view-form','view-hunt','view-end'].forEach(v => { $(v).style.display = (v===id ? 'block' : 'none'); }); window.scrollTo({top:0,behavior:'smooth'}); }
-
-function pick(color){ state.chosen = color; localStorage.setItem('vt_chosen', color); $('chooseMsg').textContent = `You chose ${color.toUpperCase()} PILL`; show('view-choose'); }
+function pick(c){state.chosen=c;localStorage.setItem('vt_chosen',c);$('chooseMsg').textContent=`You chose ${c.toUpperCase()} PILL`;show('view-choose');}
 
 function beginFromForm(){
-  const name = $('pf_name').value.trim();
-  const section = $('pf_section').value.trim();
-  const year = $('pf_year').value.trim();
-  const branch = $('pf_branch').value.trim();
-  if(!name || !section || !year || !branch){ alert('Please fill all fields.'); return; }
-  if(!/^\d+$/.test(year) || parseInt(year)<1 || parseInt(year)>6){ alert('Enter a valid year (1-6).'); return; }
-  state.player = { name, section, year, branch };
-  state.level = 0;
-  localStorage.setItem('vt_player', JSON.stringify(state.player));
-  localStorage.setItem('vt_level', state.level.toString());
-  localStorage.setItem('vt_chosen', state.chosen);
-  renderLevel();
-  show('view-hunt');
+ const name=$('pf_name').value.trim(),sec=$('pf_section').value.trim(),year=$('pf_year').value.trim(),br=$('pf_branch').value.trim();
+ if(!name||!sec||!year||!br){alert('Fill all fields');return;}
+ state.player={name,sec,year,br};state.level=0;
+ localStorage.setItem('vt_player',JSON.stringify(state.player));
+ localStorage.setItem('vt_level','0');renderLevel();show('view-hunt');
 }
 
-function getPath(){ const base = state.chosen === 'blue' ? paths.blue : paths.red; return base.concat(commonPath); }
+function getPath(){return(state.chosen==='blue'?paths.blue:paths.red).concat(commonPath);}
 
 function renderLevel(){
-  const path = getPath();
-  if(state.level >= path.length){ renderEnd(); show('view-end'); return; }
-  const step = path[state.level];
-  $('levelTitle').textContent = `Level ${state.level+1} of ${path.length} — ${step.title}`;
-  $('clueBox').innerHTML = (step.riddle || '').replace(/\n/g, '<br>');
-  $('hintSmall').textContent = `Enter the code found at the location (codes are numeric)`;
-  $('codeIn').value = '';
-  $('codeIn').focus();
+ const p=getPath();
+ if(state.level>=p.length){renderEnd();show('view-end');return;}
+ const s=p[state.level];
+ $('levelTitle').textContent=`Level ${state.level+1} of ${p.length}`;
+ $('clueBox').innerHTML=s.riddle.replace(/\n/g,'<br>');
+ $('codeIn').value='';
 }
 
 function submitCode(){
-  const val = ($('codeIn').value || '').trim();
-  if(!val){ alert('Enter the code.'); return; }
-  const expected = getPath()[state.level].code;
-  if(val.toUpperCase() === expected.toUpperCase()){
-    good();
-    state.level++;
-    localStorage.setItem('vt_level', state.level.toString());
-    if(state.level >= getPath().length){ renderEnd(); show('view-end'); }
-    else renderLevel();
-  } else {
-    bad();
-    alert('Incorrect code — try again.');
-    $('codeIn').focus();
-  }
+ const val=$('codeIn').value.trim(),exp=getPath()[state.level].code;
+ if(val===exp){state.level++;localStorage.setItem('vt_level',state.level);if(state.level>=getPath().length){renderEnd();show('view-end');}else renderLevel();}
+ else alert('Wrong code');
 }
 
-function renderEnd(){ const p = state.player || { name:'-', section:'-', year:'-', branch:'-' }; $('playerInfo').textContent = `Name: ${p.name}\nSection: ${p.section}\nYear: ${p.year}\nBranch: ${p.branch}\nPath chosen: ${state.chosen ? state.chosen.toUpperCase() : '-'}`; }
+function renderEnd(){const p=state.player;$('playerInfo').textContent=`Name: ${p.name}\nSection: ${p.sec}\nYear: ${p.year}\nBranch: ${p.br}\nPath: ${state.chosen.toUpperCase()}`;}
 
-/* ---------- init ---------- */
 (function init(){
-  if(state.player && state.chosen){
-    const path = getPath();
-    if(state.level < path.length){ renderLevel(); show('view-hunt'); return; } else { renderEnd(); show('view-end'); return; }
-  }
-  show('view-start');
+ if(state.player&&state.chosen){const pth=getPath();if(state.level<pth.length){renderLevel();show('view-hunt');return;}else{renderEnd();show('view-end');return;}}
+ show('view-start');
 })();
 </script>
 </body>
