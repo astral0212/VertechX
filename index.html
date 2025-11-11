@@ -5,93 +5,50 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>VertechX — Pixel Treasure Hunt</title>
 
-<!-- Pixel font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
   :root{
     --bg0:#050507;
     --bg1:#02110a;
-    --glow: #3af17a;
-    --muted: rgba(58,241,122,0.22);
-    --panel: rgba(0,0,0,0.55);
+    --glow:#3af17a;
+    --muted:rgba(58,241,122,0.22);
+    --panel:rgba(0,0,0,0.55);
     --accent-red:#ff6565;
     --accent-blue:#61b8ff;
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg0),var(--bg1));font-family:"Press Start 2P",monospace;color:var(--glow);-webkit-font-smoothing:antialiased}
   .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
-  /* CRT panel */
-  .panel{
-    width:980px;max-width:100%;height:86vh;max-height:980px;border-radius:8px;padding:18px;background:linear-gradient(180deg, rgba(0,0,0,0.85), rgba(0,0,0,0.78));
-    box-shadow: 0 28px 100px rgba(0,0,0,0.7), inset 0 2px 0 rgba(255,255,255,0.02);
-    position:relative;overflow:hidden; border: 2px solid rgba(58,241,122,0.04);
-  }
-  /* scanlines (pixel CRT) */
-  .panel::before{
-    content:"";position:absolute;inset:0;pointer-events:none;
-    background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size: 100% 4px;mix-blend-mode:overlay;opacity:0.6;
-  }
-
+  .panel{width:980px;max-width:100%;height:86vh;max-height:980px;border-radius:8px;padding:18px;background:linear-gradient(180deg, rgba(0,0,0,0.85), rgba(0,0,0,0.78));box-shadow:0 28px 100px rgba(0,0,0,0.7), inset 0 2px 0 rgba(255,255,255,0.02);position:relative;overflow:hidden;border:2px solid rgba(58,241,122,0.04)}
+  .panel::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);background-size:100% 4px;mix-blend-mode:overlay;opacity:0.6}
   .head{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
   .title{color:var(--glow);font-size:16px}
   .subtitle{color:var(--muted);font-size:10px;letter-spacing:1px}
-
   .screen{height:calc(100% - 64px);background:var(--panel);border-radius:6px;padding:18px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;overflow:auto}
   .view{width:100%;max-width:760px}
-
-  /* pixel buttons */
   .pill-row{display:flex;gap:18px;justify-content:center;margin-top:20px}
-  .pill{
-    min-width:140px;padding:12px 14px;border-radius:6px;cursor:pointer;border:none;font-weight:700;font-size:12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.55), inset 0 -6px 0 rgba(0,0,0,0.12);
-    image-rendering: pixelated;
-  }
-  .pill.red{background:linear-gradient(180deg,var(--accent-red),#d94d4d);color:#fff;filter:contrast(120%)}
+  .pill{min-width:140px;padding:12px 14px;border-radius:6px;cursor:pointer;border:none;font-weight:700;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,0.55), inset 0 -6px 0 rgba(0,0,0,0.12);image-rendering:pixelated}
+  .pill.red{background:linear-gradient(180deg,var(--accent-red),#d94d4d);color:#fff;filter:contrast(120%)} 
   .pill.blue{background:linear-gradient(180deg,var(--accent-blue),#318fd6);color:#fff}
-
   .big{font-size:13px;line-height:1.6}
   .muted{color:var(--muted);font-size:11px;margin-top:8px}
-
-  /* form */
   .form{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:12px}
   .form input{width:100%;max-width:420px;padding:11px;border-radius:6px;border:2px solid rgba(0,0,0,0.4);background:rgba(0,0,0,0.45);color:var(--glow);font-family:inherit;font-size:12px}
   .actions{display:flex;gap:12px;justify-content:center;margin-top:12px}
-  .btn{
-    padding:11px 14px;border-radius:6px;border:none;background:linear-gradient(90deg,#44ff9e,#2fb76b);color:#032108;cursor:pointer;font-weight:700;font-size:12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-  }
-  .btn.ghost{background:transparent;border:2px solid rgba(255,255,255,0.04);color:var(--muted);}
-
-  /* level box */
+  .btn{padding:11px 14px;border-radius:6px;border:none;background:linear-gradient(90deg,#44ff9e,#2fb76b);color:#032108;cursor:pointer;font-weight:700;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,0.5)}
+  .btn.ghost{background:transparent;border:2px solid rgba(255,255,255,0.04);color:var(--muted)}
   .level-box{display:flex;flex-direction:column;gap:12px;align-items:center}
   .level-title{font-weight:700;color:var(--glow);font-size:12px}
-  /* smaller clue font so long riddles fit */
   .clue{background:rgba(0,0,0,0.35);padding:12px;border-radius:8px;color:var(--glow);line-height:1.45;max-width:720px;font-size:11px;text-align:left}
   .code-row{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:10px}
   .code-input{padding:12px;border-radius:6px;border:2px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.4);color:var(--glow);font-family:inherit;font-size:12px;width:200px}
-
-  /* pixel cursor */
-  .pixel-cursor{
-    width:10px;height:16px;background:var(--glow);display:inline-block;margin-left:6px;animation:blink 900ms steps(1) infinite;box-shadow:0 0 10px rgba(58,241,122,0.6)
-  }
+  .pixel-cursor{width:10px;height:16px;background:var(--glow);display:inline-block;margin-left:6px;animation:blink 900ms steps(1) infinite;box-shadow:0 0 10px rgba(58,241,122,0.6)}
   @keyframes blink{50%{opacity:0}}
-
-  /* final box */
   .final-box{display:flex;flex-direction:column;gap:10px;align-items:center}
   .info{background:rgba(0,0,0,0.28);padding:12px;border-radius:8px;color:var(--glow);white-space:pre-line;max-width:720px;font-size:11px}
-
   .footer{position:absolute;left:18px;right:18px;bottom:12px;display:flex;justify-content:space-between;color:var(--muted);font-size:11px}
-
-  /* responsive */
-  @media (max-width:760px){
-    .panel{height:96vh;padding:14px;border-radius:6px}
-    .title{font-size:14px}
-    .pill{min-width:120px;padding:10px}
-    .clue{padding:10px;font-size:10px}
-    .form input{padding:10px}
-  }
+  @media (max-width:760px){.panel{height:96vh;padding:14px;border-radius:6px}.title{font-size:14px}.pill{min-width:120px;padding:10px}.clue{padding:10px;font-size:10px}.form input{padding:10px}}
 </style>
 </head>
 <body>
@@ -103,10 +60,9 @@
     </div>
 
     <div class="screen" id="screen">
-      <!-- views -->
       <div id="view-start" class="view">
         <div class="big">Choose your path — red pill or blue pill</div>
-        <div class="muted">Each pill gives a different sequence of clues. Pick one to start.</div>
+        <div class="muted">Each pill leads to a path. Both merge at the Basketball step (code: 5614).</div>
         <div class="pill-row">
           <button class="pill red" id="chooseRed">RED PILL</button>
           <button class="pill blue" id="chooseBlue">BLUE PILL</button>
@@ -157,7 +113,6 @@
           <div class="big">🎉 CONGRATULATIONS — YOU WON!</div>
           <div class="info" id="playerInfo">Name: ...</div>
           <div class="muted">Share this screenshot with the Head to collect your prize.</div>
-          <!-- no restart -->
         </div>
       </div>
 
@@ -171,12 +126,11 @@
 </div>
 
 <script>
-/* ---------- updated codes & teacher -> entrance gate change ---------- */
+/* ---------- final mapping: both paths merge at Basketball (5614) ---------- */
 
-/* Paths: assign codes exactly as requested.
-   Red path codes: 1010, 2378, 5614
-   Blue path codes: 1001, 7022, (3rd -> 1234 left as-is)
-   Common path codes: 1997, 6769, 1234, 1234
+/* Red codes: 1010, 2378, 5614
+   Blue codes: 1001, 7022, 5614  (basketball is 5614 here too)
+   Common codes after basketball: 1997, 6769, 1234, 1234
 */
 
 const paths = {
@@ -226,15 +180,11 @@ Seek the model that shows it all.`,
 Aim the basket, chase the ball.
 Cheers arise and dreams rebound —
 Your next clue waits on this ground.`,
-      code: '1234' /* left as default because you provided only two blue codes */
+      code: '5614'
     }
   ]
 };
 
-/* Common steps now in exact order:
-   After basketball -> Entrance Gate -> Notice Poem -> Opposite 139 -> Broken Cabinet finish
-   Codes assigned as: 1997, 6769, 1234, 1234
-*/
 const commonPath = [
   { title: 'Entrance Gate', riddle: `Check the entrance gate of the college for the clue.`, code: '1997' },
   { title: 'Notice Board (poem)', riddle: `Dreams are pinned where futures start,
@@ -264,46 +214,24 @@ $('startHunt').addEventListener('click', beginFromForm);
 $('submitCode').addEventListener('click', submitCode);
 $('codeIn').addEventListener('keydown', e=> { if(e.key==='Enter') submitCode(); });
 
-/* ---------- audio (tiny 8-bit style) ---------- */
+/* ---------- audio ---------- */
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 const audioCtx = AudioCtx ? new AudioCtx() : null;
-function tone(freq,len=0.08,type='square'){
-  if(!audioCtx) return;
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.type = type; o.frequency.value = freq;
-  g.gain.value = 0.06;
-  o.connect(g); g.connect(audioCtx.destination);
-  o.start();
-  g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + len);
-  o.stop(audioCtx.currentTime + len + 0.02);
-}
+function tone(freq,len=0.08,type='square'){ if(!audioCtx) return; const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = type; o.frequency.value = freq; g.gain.value = 0.06; o.connect(g); g.connect(audioCtx.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + len); o.stop(audioCtx.currentTime + len + 0.02); }
 function good(){ tone(880,0.08); setTimeout(()=>tone(1200,0.08),90); }
 function bad(){ tone(200,0.14,'sawtooth'); }
 
-/* ---------- view helpers ---------- */
-function show(id){
-  ['view-start','view-choose','view-form','view-hunt','view-end'].forEach(v => { $(v).style.display = (v===id ? 'block' : 'none'); });
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+/* ---------- helpers ---------- */
+function show(id){ ['view-start','view-choose','view-form','view-hunt','view-end'].forEach(v => { $(v).style.display = (v===id ? 'block' : 'none'); }); window.scrollTo({top:0,behavior:'smooth'}); }
 
-/* ---------- pick and form ---------- */
-function pick(color){
-  state.chosen = color;
-  localStorage.setItem('vt_chosen', color);
-  $('chooseMsg').textContent = `You chose ${color.toUpperCase()} PILL`;
-  show('view-choose');
-}
+function pick(color){ state.chosen = color; localStorage.setItem('vt_chosen', color); $('chooseMsg').textContent = `You chose ${color.toUpperCase()} PILL`; show('view-choose'); }
 
 function beginFromForm(){
   const name = $('pf_name').value.trim();
   const section = $('pf_section').value.trim();
   const year = $('pf_year').value.trim();
   const branch = $('pf_branch').value.trim();
-  if(!name || !section || !year || !branch){
-    alert('Please fill all fields.');
-    return;
-  }
+  if(!name || !section || !year || !branch){ alert('Please fill all fields.'); return; }
   if(!/^\d+$/.test(year) || parseInt(year)<1 || parseInt(year)>6){ alert('Enter a valid year (1-6).'); return; }
   state.player = { name, section, year, branch };
   state.level = 0;
@@ -314,21 +242,13 @@ function beginFromForm(){
   show('view-hunt');
 }
 
-/* ---------- combined path logic (path-specific steps + commonPath) ---------- */
-function getPath(){
-  const base = state.chosen === 'blue' ? paths.blue : paths.red;
-  return base.concat(commonPath);
-}
+function getPath(){ const base = state.chosen === 'blue' ? paths.blue : paths.red; return base.concat(commonPath); }
 
-/* ---------- level render & submit ---------- */
 function renderLevel(){
   const path = getPath();
-  if(state.level >= path.length){
-    renderEnd(); show('view-end'); return;
-  }
+  if(state.level >= path.length){ renderEnd(); show('view-end'); return; }
   const step = path[state.level];
   $('levelTitle').textContent = `Level ${state.level+1} of ${path.length} — ${step.title}`;
-  // render riddle with line-breaks
   $('clueBox').innerHTML = (step.riddle || '').replace(/\n/g, '<br>');
   $('hintSmall').textContent = `Enter the code found at the location (codes are numeric)`;
   $('codeIn').value = '';
@@ -352,28 +272,14 @@ function submitCode(){
   }
 }
 
-/* ---------- end ---------- */
-function renderEnd(){
-  const p = state.player || { name:'-', section:'-', year:'-', branch:'-'};
-  $('playerInfo').textContent = `Name: ${p.name}\nSection: ${p.section}\nYear: ${p.year}\nBranch: ${p.branch}\nPath chosen: ${state.chosen ? state.chosen.toUpperCase() : '-'}`;
-}
+function renderEnd(){ const p = state.player || { name:'-', section:'-', year:'-', branch:'-' }; $('playerInfo').textContent = `Name: ${p.name}\nSection: ${p.section}\nYear: ${p.year}\nBranch: ${p.branch}\nPath chosen: ${state.chosen ? state.chosen.toUpperCase() : '-'}`; }
 
 /* ---------- init ---------- */
 (function init(){
-  // If mid-hunt with player & chosen, resume
   if(state.player && state.chosen){
     const path = getPath();
-    if(state.level < path.length){
-      renderLevel();
-      show('view-hunt');
-      return;
-    } else {
-      renderEnd();
-      show('view-end');
-      return;
-    }
+    if(state.level < path.length){ renderLevel(); show('view-hunt'); return; } else { renderEnd(); show('view-end'); return; }
   }
-  // default view
   show('view-start');
 })();
 </script>
