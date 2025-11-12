@@ -14,6 +14,7 @@
     --panel:rgba(0,0,0,0.55);
     --accent-red:#ff6565;
     --accent-blue:#61b8ff;
+    --link: #7ee7a4;
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg0),var(--bg1));font-family:"Press Start 2P",monospace;color:var(--glow);-webkit-font-smoothing:antialiased}
@@ -44,7 +45,10 @@
   .pixel-cursor{width:10px;height:16px;background:var(--glow);display:inline-block;margin-left:6px;animation:blink 900ms steps(1) infinite;box-shadow:0 0 10px rgba(58,241,122,0.6)}
   @keyframes blink{50%{opacity:0}}
   .final-box{display:flex;flex-direction:column;gap:10px;align-items:center}
-  .info{background:rgba(0,0,0,0.28);padding:12px;border-radius:8px;color:var(--glow);white-space:pre-line;max-width:720px;font-size:11px}
+  .info{background:rgba(0,0,0,0.28);padding:12px;border-radius:8px;color:var(--glow);white-space:pre-line;max-width:720px;font-size:11px;text-align:left}
+  .contact{background:rgba(0,0,0,0.22);padding:12px;border-radius:8px;color:var(--glow);max-width:720px;font-size:12px}
+  .contact a{color:var(--link);text-decoration:none;font-weight:700}
+  .contact small{display:block;color:var(--muted);font-size:10px;margin-top:6px}
   .footer{position:absolute;left:18px;right:18px;bottom:12px;display:flex;justify-content:space-between;color:var(--muted);font-size:11px}
   @media (max-width:760px){.panel{height:96vh;padding:14px;border-radius:6px}.title{font-size:14px}.pill{min-width:120px;padding:10px}.clue{padding:10px;font-size:10px}.form input{padding:10px}}
 </style>
@@ -54,7 +58,7 @@
   <div class="panel" role="application" aria-label="VertechX Pixel Treasure Hunt">
     <div class="head">
       <div class="title">VERTECHX — MVJ COLLEGE OF ENGINEERING</div>
-      <div class="subtitle">Pixel Terminal — Choose a pill to begin</div>
+      <div class="subtitle">Pixel Terminal — Treasure Hunt</div>
     </div>
 
     <div class="screen" id="screen">
@@ -108,9 +112,20 @@
 
       <div id="view-end" class="view" style="display:none">
         <div class="final-box">
-          <div class="big">🎉 CONGRATULATIONS — YOU WON!</div>
+          <div class="big">🎉 CONGRATULATIONS — YOU'VE WON!</div>
+
           <div class="info" id="playerInfo">Name: ...</div>
-          <div class="muted">Share this screenshot with the Head to collect your prize.</div>
+
+          <div class="contact" id="contactBox">
+            <div style="font-weight:700;margin-bottom:8px">Please claim your prize — share this screenshot on WhatsApp to any of the numbers below:</div>
+
+            <div style="display:flex;gap:12px;flex-direction:column;align-items:flex-start">
+              <a id="wa1" href="https://wa.me/918884243814" target="_blank">+91 8884243814 — WhatsApp</a>
+              <a id="wa2" href="https://wa.me/917204162819" target="_blank">+91 7204162819 — WhatsApp</a>
+            </div>
+
+            <small>Tap a number to open WhatsApp (web/app). Make sure to attach a screenshot of this final page showing your info.</small>
+          </div>
         </div>
       </div>
 
@@ -124,80 +139,46 @@
 </div>
 
 <script>
-/* Final mapping (updated per your last request):
-   - Red: 1010, 2378, 5614
-   - Blue: 1001, 7022, 5614
-   - After Basketball (merged): College Entrance (1997), Notice board poem (6769), Opposite 139 hint (8012), Broken cabinet finish (3335)
-*/
-
+/* Paths & codes are unchanged from your final mapping */
 const paths = {
   red: [
-    {
-      title: 'The Watcher',
-      riddle: `I stand apart, a watcher of all,
+    { title:'The Watcher', riddle:`I stand apart, a watcher of all,
 Beneath my shade, the shadows fall.
 Alone I grow, yet secrets I keep —
-Find me where silence dares to sleep.`,
-      code: '1010'
-    },
-    {
-      title: 'Canteen Notice Board',
-      riddle: `Where hunger fades and chatter flows,
+Find me where silence dares to sleep.`, code:'1010' },
+    { title:'Canteen Notice Board', riddle:`Where hunger fades and chatter flows,
 Beside the scent that tempts your nose.
 Among the plates and laughter stored,
-Lies your sign upon the board.`,
-      code: '2378'
-    },
-    {
-      title: 'Basketball Board',
-      riddle: `Where echoes bounce and players call,
+Lies your sign upon the board.`, code:'2378' },
+    { title:'Basketball Board', riddle:`Where echoes bounce and players call,
 Aim the basket, chase the ball.
 Cheers arise and dreams rebound —
-Your next clue waits on this ground.`,
-      code: '5614'
-    }
+Your next clue waits on this ground.`, code:'5614' }
   ],
   blue: [
-    {
-      title: 'VertechX Logo Spot',
-      riddle: `Find the VertechX display area and look for a hidden sticker with a code.`,
-      code: '1001'
-    },
-    {
-      title: 'Auditorium Miniature',
-      riddle: `I mirror walls both big and tall,
+    { title:'VertechX Logo Spot', riddle:`Find the VertechX display area and look for a hidden sticker with a code.`, code:'1001' },
+    { title:'Auditorium Miniature', riddle:`I mirror walls both big and tall,
 Yet fit within a frame so small.
 A tiny world, both neat and whole —
-Seek the model that shows it all.`,
-      code: '7022'
-    },
-    {
-      title: 'Basketball Board',
-      riddle: `Where echoes bounce and players call,
+Seek the model that shows it all.`, code:'7022' },
+    { title:'Basketball Board', riddle:`Where echoes bounce and players call,
 Aim the basket, chase the ball.
 Cheers arise and dreams rebound —
-Your next clue waits on this ground.`,
-      code: '5614'
-    }
+Your next clue waits on this ground.`, code:'5614' }
   ]
 };
 
-/* Common path after basketball (exact order from your paper):
-   1) College Entrance (was Teacher Help) — 1997
-   2) Notice Board (poem) — 6769
-   3) Notice Board (location hint opposite room 139) — 8012
-   4) Broken Cabinet (Entrance) — Finish — 3335
-*/
 const commonPath = [
-  { title: 'College Entrance', riddle: `Check the college entrance for the clue.`, code: '1997' },
-  { title: 'Notice Board (poem)', riddle: `Dreams are pinned where futures start,
+  { title:'College Entrance', riddle:`Check the college entrance for the clue.`, code:'1997' },
+  { title:'Notice Board (poem)', riddle:`Dreams are pinned where futures start,
 Admission hopes and notice art.
 Seek the board where goals are scored —
-Your clue awaits upon the board.`, code: '6769' },
-  { title: 'Notice Board (location hint)', riddle: `It sits opposite room 139.`, code: '8012' },
-  { title: 'Broken Cabinet (Entrance) — Finish', riddle: `Broken at the beginning lies another clue.`, code: '3335' }
+Your clue awaits upon the board.`, code:'6769' },
+  { title:'Notice Board (location hint)', riddle:`It sits opposite room 139.`, code:'8012' },
+  { title:'Broken Cabinet (Entrance) — Finish', riddle:`Broken at the beginning lies another clue.`, code:'3335' }
 ];
 
+/* state */
 let state = {
   chosen: localStorage.getItem('vt_chosen') || null,
   player: JSON.parse(localStorage.getItem('vt_player') || 'null'),
@@ -276,7 +257,9 @@ function submitCode(){
 
 function renderEnd(){
   const p = state.player || { name:'-', section:'-', year:'-', branch:'-'};
+  // player info box
   $('playerInfo').textContent = `Name: ${p.name}\nSection: ${p.section}\nYear: ${p.year}\nBranch: ${p.branch}\nPath chosen: ${state.chosen ? state.chosen.toUpperCase() : '-'}`;
+  // contact links are already present in HTML; nothing else needed
 }
 
 /* init */
